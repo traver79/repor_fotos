@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Reportaje PDF" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Reportaje PDF</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-inner">
+      <span class="header-icon">📷</span>
+      <h1>Reportaje PDF</h1>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <form id="reportForm" novalidate>
+
+      <!-- ASUNTO -->
+      <section class="form-section">
+        <label class="field-label" for="asunto">
+          <span class="label-icon">📋</span> Asunto
+        </label>
+        <textarea id="asunto" name="asunto" class="field-textarea" rows="3"
+          placeholder="Describe el asunto del reportaje..." required></textarea>
+      </section>
+
+      <!-- FECHA -->
+      <section class="form-section">
+        <label class="field-label" for="fecha">
+          <span class="label-icon">📅</span> Fecha
+        </label>
+        <input type="date" id="fecha" name="fecha" class="field-input" required />
+      </section>
+
+      <!-- OBSERVACIONES -->
+      <section class="form-section">
+        <label class="field-label" for="observaciones">
+          <span class="label-icon">📝</span> Observaciones
+        </label>
+        <textarea id="observaciones" name="observaciones" class="field-textarea" rows="4"
+          placeholder="Observaciones adicionales..."></textarea>
+      </section>
+
+      <!-- FOTOS -->
+      <section class="form-section fotos-section">
+        <div class="fotos-header">
+          <span class="field-label"><span class="label-icon">🖼️</span> Fotos</span>
+          <div class="foto-add-btns">
+            <button type="button" class="btn-add-foto" id="btnGaleria">
+              <span>🗂️</span> Galería
+            </button>
+            <button type="button" class="btn-add-foto" id="btnCamara">
+              <span>📸</span> Cámara
+            </button>
+          </div>
+        </div>
+
+        <!-- inputs ocultos -->
+        <input type="file" id="inputGaleria" accept="image/*" multiple style="display:none" />
+        <input type="file" id="inputCamara" accept="image/*" capture="environment" style="display:none" />
+
+        <!-- contador de fotos -->
+        <div class="foto-counter" id="fotoCounter" style="display:none">
+          <span id="fotoCounterText">0 fotos añadidas</span>
+          <span class="counter-hint">El PDF mostrará 4 fotos por página (2×2)</span>
+        </div>
+
+        <!-- lista de fotos -->
+        <div id="fotosContainer" class="fotos-container">
+          <div class="fotos-empty" id="fotosEmpty">
+            <span class="empty-icon">🏞️</span>
+            <p>Añade fotos desde la galería<br/>o con la cámara</p>
+            <p class="empty-hint">Cada foto tendrá su propio comentario.<br/>El PDF las organiza en 4 por página.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BOTÓN GENERAR -->
+      <div class="generate-section">
+        <button type="submit" class="btn-generate" id="btnGenerar">
+          <span class="btn-icon">📄</span>
+          <span class="btn-text">GENERAR PDF</span>
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

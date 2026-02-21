@@ -1,0 +1,12 @@
+{
+  "name": "Reportaje PDF",
+  "short_name": "Reportaje",
+  "description": "Crea reportajes fotográficos en PDF desde tu móvil",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait",
+  "icons": [],
+  "categories": ["productivity", "photography"]
+}
