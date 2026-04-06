@@ -1,68 +1,58 @@
-/* ============================================
-   REPORTAJE PDF - App Logic v2
-   ============================================ */
-
 'use strict';
 
-// ---- Estado ----
-// fotos: array de { dataUrl, comentario, numeroReal }
-// usamos array simple; al eliminar lo marcamos null
 const fotos = [];
-let contadorFotos = 0; // número incremental visible para el usuario
+let contadorFotos = 0;
 
-// ---- Elementos DOM ----
-const reportForm     = document.getElementById('reportForm');
-const asuntoEl       = document.getElementById('asunto');
-const fechaEl        = document.getElementById('fecha');
-const observEl       = document.getElementById('observaciones');
-const inputGaleria   = document.getElementById('inputGaleria');
-const inputCamara    = document.getElementById('inputCamara');
-const btnGaleria     = document.getElementById('btnGaleria');
-const btnCamara      = document.getElementById('btnCamara');
+const reportForm = document.getElementById('reportForm');
+const asuntoEl = document.getElementById('asunto');
+const direccionEl = document.getElementById('direccionCliente');
+const descripcionEl = document.getElementById('descripcionGeneral');
+const fechaEl = document.getElementById('fecha');
+const inputGaleria = document.getElementById('inputGaleria');
+const inputCamara = document.getElementById('inputCamara');
+const btnGaleria = document.getElementById('btnGaleria');
+const btnCamara = document.getElementById('btnCamara');
 const fotosContainer = document.getElementById('fotosContainer');
-const fotosEmpty     = document.getElementById('fotosEmpty');
-const fotoCounter    = document.getElementById('fotoCounter');
-const fotoCounterText= document.getElementById('fotoCounterText');
-const btnGenerar     = document.getElementById('btnGenerar');
-const toastEl        = document.getElementById('toast');
+const fotosEmpty = document.getElementById('fotosEmpty');
+const fotoCounter = document.getElementById('fotoCounter');
+const fotoCounterText = document.getElementById('fotoCounterText');
+const btnGenerar = document.getElementById('btnGenerar');
+const toastEl = document.getElementById('toast');
 
-// ---- Fecha por defecto (hoy) ----
 (function setDefaultDate() {
   const hoy = new Date();
   const yyyy = hoy.getFullYear();
-  const mm   = String(hoy.getMonth() + 1).padStart(2, '0');
-  const dd   = String(hoy.getDate()).padStart(2, '0');
+  const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dd = String(hoy.getDate()).padStart(2, '0');
   fechaEl.value = `${yyyy}-${mm}-${dd}`;
 })();
 
-// ---- Botones añadir foto ----
 btnGaleria.addEventListener('click', () => inputGaleria.click());
-btnCamara.addEventListener('click',  () => inputCamara.click());
-
+btnCamara.addEventListener('click', () => inputCamara.click());
 inputGaleria.addEventListener('change', (e) => handleFiles(e.target.files));
-inputCamara.addEventListener('change',  (e) => handleFiles(e.target.files));
+inputCamara.addEventListener('change', (e) => handleFiles(e.target.files));
 
-// ---- Procesar archivos de imagen ----
 function handleFiles(files) {
   if (!files || files.length === 0) return;
-  [...files].forEach(file => {
+
+  [...files].forEach((file) => {
     if (!file.type.startsWith('image/')) return;
+
     const reader = new FileReader();
     reader.onload = (e) => {
-      const dataUrl = e.target.result;
       const idx = fotos.length;
-      contadorFotos++;
-      fotos.push({ dataUrl, comentario: '', numeroReal: contadorFotos });
+      contadorFotos += 1;
+      fotos.push({ dataUrl: e.target.result, comentario: '', numeroReal: contadorFotos });
       renderFotoCard(idx);
       updateUI();
     };
     reader.readAsDataURL(file);
   });
+
   inputGaleria.value = '';
-  inputCamara.value  = '';
+  inputCamara.value = '';
 }
 
-// ---- Renderizar tarjeta de foto ----
 function renderFotoCard(idx) {
   const foto = fotos[idx];
   const card = document.createElement('div');
@@ -71,283 +61,206 @@ function renderFotoCard(idx) {
 
   card.innerHTML = `
     <div class="foto-card-header">
-      <span class="foto-numero">📷 Foto ${foto.numeroReal}</span>
-      <button type="button" class="btn-remove-foto">🗑️ Eliminar</button>
+      <span class="foto-numero">Foto ${foto.numeroReal}</span>
+      <button type="button" class="btn-remove-foto">Eliminar</button>
     </div>
     <img class="foto-card-img" src="${foto.dataUrl}" alt="Foto ${foto.numeroReal}" loading="lazy" />
     <div class="foto-card-body">
-      <label class="foto-comentario-label">Comentario de la foto ${foto.numeroReal}:</label>
-      <textarea
-        class="foto-comentario"
-        placeholder="Escribe aquí el comentario para esta foto..."
-        rows="2"
-      ></textarea>
+      <label class="foto-comentario-label" for="fotoComentario${idx}">Comentario</label>
+      <textarea id="fotoComentario${idx}" class="foto-comentario" rows="2" placeholder="Comentario de esta foto"></textarea>
     </div>
   `;
 
-  // Sincronizar comentario
   const textarea = card.querySelector('.foto-comentario');
   textarea.addEventListener('input', () => {
-    fotos[idx].comentario = textarea.value;
+    if (fotos[idx]) fotos[idx].comentario = textarea.value;
   });
 
-  // Eliminar
   card.querySelector('.btn-remove-foto').addEventListener('click', () => {
     fotos[idx] = null;
-    card.style.transition = 'opacity .2s, transform .2s';
-    card.style.opacity = '0';
-    card.style.transform = 'scale(.95)';
-    setTimeout(() => { card.remove(); updateUI(); }, 200);
+    card.remove();
+    updateUI();
   });
 
   fotosContainer.appendChild(card);
 }
 
-// ---- Actualizar estado UI ----
 function updateUI() {
-  const activas = fotos.filter(f => f !== null);
+  const activas = fotos.filter((f) => f !== null);
   const n = activas.length;
 
-  fotosEmpty.style.display  = n === 0 ? 'flex' : 'none';
+  fotosEmpty.style.display = n === 0 ? 'flex' : 'none';
   fotoCounter.style.display = n === 0 ? 'none' : 'flex';
 
   if (n > 0) {
     const paginas = Math.ceil(n / 4);
-    fotoCounterText.textContent =
-      `${n} foto${n !== 1 ? 's' : ''} añadida${n !== 1 ? 's' : ''} · ${paginas} página${paginas !== 1 ? 's' : ''} de fotos en el PDF`;
+    fotoCounterText.textContent = `${n} foto${n !== 1 ? 's' : ''} · ${paginas} página${paginas !== 1 ? 's' : ''}`;
   }
 }
 
-// ============================================================
-// ---- GENERAR PDF ----
-// ============================================================
 reportForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const asunto = asuntoEl.value.trim();
-  const fecha  = fechaEl.value;
+  const direccionCliente = direccionEl.value.trim();
+  const descripcionGeneral = descripcionEl.value.trim();
+  const fecha = fechaEl.value;
 
-  if (!asunto) { showToast('⚠️ El asunto es obligatorio'); asuntoEl.focus(); return; }
-  if (!fecha)  { showToast('⚠️ Selecciona una fecha'); fechaEl.focus(); return; }
-
-  const fotosActivas = fotos.filter(f => f !== null);
-
-  btnGenerar.disabled = true;
-  btnGenerar.classList.add('loading');
-  showToast('⏳ Generando PDF...');
-
-  try {
-    await generarPDF(asunto, fecha, observEl.value.trim(), fotosActivas);
-    showToast('✅ PDF generado correctamente');
-  } catch (err) {
-    console.error(err);
-    showToast('❌ Error al generar el PDF');
-  } finally {
-    btnGenerar.disabled = false;
-    btnGenerar.classList.remove('loading');
-  }
-});
-
-// ============================================================
-// PDF: layout 2×2 (4 fotos por página de contenido)
-// ============================================================
-async function generarPDF(asunto, fecha, observaciones, fotosActivas) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-  const pageW  = doc.internal.pageSize.getWidth();   // 210
-  const pageH  = doc.internal.pageSize.getHeight();  // 297
-  const margin = 12;
-  const contentW = pageW - margin * 2;               // 186
-  const fechaFormateada = formatearFecha(fecha);
-
-  // ── helper: dibuja la cabecera roja en la página actual ──
-  function drawHeader(isFirst) {
-    doc.setFillColor(230, 57, 70);
-    doc.rect(0, 0, pageW, 22, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(isFirst ? 10 : 8.5);
-    doc.setTextColor(255, 255, 255);
-    doc.text('REPORTAJE FOTOGRÁFICO', margin, 9);
-    if (isFirst) {
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(255, 210, 210);
-      doc.text(fechaFormateada, pageW - margin, 9, { align: 'right' });
-    }
-  }
-
-  // ── helper: pie de página ──
-  // Se llama al final cuando ya sabemos totalPages
-  function drawFooters(totalPages) {
-    for (let p = 1; p <= totalPages; p++) {
-      doc.setPage(p);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(160, 160, 190);
-      doc.text(
-        `Página ${p} de ${totalPages}  ·  ${fechaFormateada}`,
-        pageW / 2, pageH - 5, { align: 'center' }
-      );
-    }
-  }
-
-  // ============================================================
-  // PÁGINA 1: Portada / datos generales
-  // ============================================================
-  drawHeader(true);
-
-  let y = 30;
-
-  // Asunto
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.setTextColor(20, 20, 40);
-  const asuntoLines = doc.splitTextToSize(asunto, contentW);
-  asuntoLines.forEach(line => { doc.text(line, margin, y); y += 8; });
-
-  y += 2;
-  doc.setDrawColor(230, 57, 70);
-  doc.setLineWidth(0.7);
-  doc.line(margin, y, pageW - margin, y);
-  y += 7;
-
-  // Observaciones
-  if (observaciones) {
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(8);
-    doc.setTextColor(180, 50, 60);
-    doc.text('OBSERVACIONES', margin, y);
-    y += 5;
-
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(50, 50, 70);
-    const obsLines = doc.splitTextToSize(observaciones, contentW);
-    obsLines.forEach(line => { doc.text(line, margin, y); y += 5; });
-    y += 3;
-  }
-
-  // Si no hay fotos, cerrar aquí
-  if (fotosActivas.length === 0) {
-    drawFooters(doc.internal.getNumberOfPages());
-    doc.save(`reportaje_${fecha.replace(/-/g,'')}.pdf`);
+  if (!asunto) {
+    showToast('El asunto general es obligatorio');
+    asuntoEl.focus();
     return;
   }
 
-  // Resumen de fotos en portada
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(8);
-  doc.setTextColor(180, 50, 60);
-  doc.text('CONTENIDO', margin, y);
-  y += 5;
+  if (!fecha) {
+    showToast('Selecciona una fecha');
+    fechaEl.focus();
+    return;
+  }
+
+  const fotosActivas = fotos.filter((f) => f !== null);
+
+  btnGenerar.disabled = true;
+  showToast('Generando PDF...');
+
+  try {
+    await generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha, fotosActivas });
+    showToast('PDF generado');
+  } catch (error) {
+    console.error(error);
+    showToast('Error al generar PDF');
+  } finally {
+    btnGenerar.disabled = false;
+  }
+});
+
+async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha, fotosActivas }) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 15;
+  const contentW = pageW - margin * 2;
+  const footerY = pageH - 8;
+
+  function drawHeader(title) {
+    doc.setFillColor(238, 238, 238);
+    doc.rect(0, 0, pageW, 20, 'F');
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text(title, margin, 13);
+  }
+
+  drawHeader('Reporte fotográfico');
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9.5);
-  doc.setTextColor(50, 50, 70);
-  const pagsFotos = Math.ceil(fotosActivas.length / 4);
-  doc.text(
-    `${fotosActivas.length} fotografía${fotosActivas.length !== 1 ? 's' : ''} en ${pagsFotos} página${pagsFotos !== 1 ? 's' : ''}`,
-    margin, y
-  );
+  doc.setFontSize(10);
+  doc.text(`Fecha: ${formatearFecha(fecha)}`, margin, 28);
 
-  // ============================================================
-  // PÁGINAS DE FOTOS: layout 2 columnas × 2 filas = 4 por página
-  // ============================================================
+  let y = 38;
+  y = drawBlock(doc, 'Asunto general', asunto, margin, y, contentW);
+  y = drawBlock(doc, 'Dirección del cliente', direccionCliente || 'No indicada', margin, y, contentW);
+  y = drawBlock(doc, 'Descriptivo', descripcionGeneral || 'Sin descriptivo', margin, y, contentW);
 
-  // Medidas de cada celda
-  const colGap  = 6;   // separación horizontal entre columnas
-  const rowGap  = 5;   // separación vertical entre filas
-  const comH    = 10;  // altura reservada para el comentario (1-2 líneas)
-  const headerH = 22;  // altura de la cabecera roja
-  const footerH = 10;  // margen inferior para pie de página
-  const usableH = pageH - headerH - margin - footerH;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  const totalPagFotos = Math.ceil((fotosActivas.length || 1) / 4);
+  doc.text(`Fotos: ${fotosActivas.length} (${totalPagFotos} página${totalPagFotos !== 1 ? 's' : ''})`, margin, y + 2);
 
-  // Cada celda ocupa la mitad del ancho disponible
-  const cellW = (contentW - colGap) / 2;
-  // Dos filas: cada fila = (usableH - rowGap) / 2 , descontando comentario
-  const rowH  = (usableH - rowGap) / 2;
-  const imgH  = rowH - comH - 4; // altura de la imagen dentro de la fila
+  if (fotosActivas.length > 0) {
+    const headerBottom = 25;
+    const footerSpace = 12;
+    const colGap = 6;
+    const rowGap = 6;
+    const comentarioH = 13;
 
-  // Posiciones X de cada columna
-  const colX = [margin, margin + cellW + colGap];
+    const usableH = pageH - headerBottom - margin - footerSpace;
+    const cellW = (contentW - colGap) / 2;
+    const rowH = (usableH - rowGap) / 2;
+    const imgH = rowH - comentarioH - 3;
 
-  // Procesamos las fotos de 4 en 4
-  for (let i = 0; i < fotosActivas.length; i++) {
-    const posEnPagina = i % 4; // 0..3
+    const colX = [margin, margin + cellW + colGap];
 
-    // Al inicio de cada grupo de 4 → nueva página
-    if (posEnPagina === 0) {
-      doc.addPage();
-      drawHeader(false);
-    }
+    for (let i = 0; i < fotosActivas.length; i += 1) {
+      const pos = i % 4;
 
-    const col = posEnPagina % 2;       // 0 = izq, 1 = der
-    const row = Math.floor(posEnPagina / 2); // 0 = arriba, 1 = abajo
+      if (pos === 0) {
+        doc.addPage();
+        drawHeader('Fotos');
+      }
 
-    const x  = colX[col];
-    const yBase = headerH + margin + row * (rowH + rowGap);
+      const col = pos % 2;
+      const row = Math.floor(pos / 2);
+      const x = colX[col];
+      const yBase = headerBottom + margin + row * (rowH + rowGap);
+      const foto = fotosActivas[i];
 
-    const foto = fotosActivas[i];
+      doc.setDrawColor(170);
+      doc.setLineWidth(0.2);
+      doc.rect(x, yBase, cellW, rowH);
 
-    // Número de foto pequeño
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
-    doc.setTextColor(200, 80, 90);
-    doc.text(`FOTO ${foto.numeroReal}`, x, yBase + 4);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text(`Foto ${foto.numeroReal}`, x + 2, yBase + 4);
 
-    // Imagen
-    const imgY = yBase + 6;
-    const format = getImgFormat(foto.dataUrl);
+      const imgY = yBase + 6;
+      const format = getImgFormat(foto.dataUrl);
+      const dims = await getImageDimensions(foto.dataUrl);
 
-    // Calcular dimensiones preservando aspecto dentro de cellW × imgH
-    const dims = await getImageDimensions(foto.dataUrl);
-    let dw = cellW, dh = (cellW * dims.height) / dims.width;
-    if (dh > imgH) { dh = imgH; dw = (imgH * dims.width) / dims.height; }
-    const imgX = x + (cellW - dw) / 2;
+      let dw = cellW - 2;
+      let dh = (dw * dims.height) / dims.width;
+      if (dh > imgH) {
+        dh = imgH;
+        dw = (dh * dims.width) / dims.height;
+      }
+      const imgX = x + (cellW - dw) / 2;
 
-    // Fondo gris de la celda imagen
-    doc.setFillColor(235, 235, 240);
-    doc.rect(x, imgY, cellW, imgH, 'F');
+      doc.addImage(foto.dataUrl, format, imgX, imgY, dw, dh);
 
-    doc.addImage(foto.dataUrl, format, imgX, imgY, dw, dh);
+      const comentarioY = yBase + rowH - comentarioH + 3;
+      const comentarioTexto = (foto.comentario || 'Sin comentario').trim();
+      const lineas = doc.splitTextToSize(comentarioTexto, cellW - 4).slice(0, 3);
 
-    // Comentario debajo de la imagen
-    const comY = imgY + imgH + 1.5;
-    if (foto.comentario) {
-      doc.setFillColor(248, 248, 252);
-      doc.rect(x, comY, cellW, comH - 1, 'F');
-
-      doc.setFont('helvetica', 'italic');
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(7);
-      doc.setTextColor(60, 60, 80);
-      const comLines = doc.splitTextToSize(foto.comentario, cellW - 2);
-      const maxLines = 2;
-      comLines.slice(0, maxLines).forEach((line, li) => {
-        doc.text(line, x + 1.5, comY + 3.5 + li * 3.5);
+      lineas.forEach((linea, idx) => {
+        doc.text(linea, x + 2, comentarioY + idx * 3.2);
       });
-    } else {
-      doc.setFillColor(240, 240, 245);
-      doc.rect(x, comY, cellW, comH - 1, 'F');
-      doc.setFont('helvetica', 'italic');
-      doc.setFontSize(6.5);
-      doc.setTextColor(180, 180, 200);
-      doc.text('Sin comentario', x + 1.5, comY + 3.5);
     }
   }
 
-  // ── Pie de página en TODAS las páginas ──
-  drawFooters(doc.internal.getNumberOfPages());
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let page = 1; page <= totalPages; page += 1) {
+    doc.setPage(page);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.text(`Página ${page} de ${totalPages}`, pageW / 2, footerY, { align: 'center' });
+  }
 
-  // ── Descargar ──
-  doc.save(`reportaje_${fecha.replace(/-/g,'')}.pdf`);
+  doc.save(`reporte_${fecha.replace(/-/g, '')}.pdf`);
 }
 
-// ---- Helpers ----
+function drawBlock(doc, title, value, x, y, width) {
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(9);
+  doc.text(title, x, y);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  const lines = doc.splitTextToSize(value, width);
+  let textY = y + 5;
+  lines.forEach((line) => {
+    doc.text(line, x, textY);
+    textY += 4.5;
+  });
+  return textY + 3;
+}
 
 function getImgFormat(dataUrl) {
   if (dataUrl.includes('image/jpeg') || dataUrl.includes('image/jpg')) return 'JPEG';
-  if (dataUrl.includes('image/png'))  return 'PNG';
+  if (dataUrl.includes('image/png')) return 'PNG';
   if (dataUrl.includes('image/webp')) return 'WEBP';
   return 'JPEG';
 }
@@ -355,7 +268,7 @@ function getImgFormat(dataUrl) {
 function getImageDimensions(dataUrl) {
   return new Promise((resolve) => {
     const img = new Image();
-    img.onload  = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
     img.onerror = () => resolve({ width: 4, height: 3 });
     img.src = dataUrl;
   });
@@ -364,23 +277,18 @@ function getImageDimensions(dataUrl) {
 function formatearFecha(fechaStr) {
   if (!fechaStr) return '';
   const [y, m, d] = fechaStr.split('-');
-  const meses = ['enero','febrero','marzo','abril','mayo','junio',
-                  'julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  return `${parseInt(d)} de ${meses[parseInt(m) - 1]} de ${y}`;
+  return `${d}/${m}/${y}`;
 }
 
-function showToast(msg, duration = 2800) {
+function showToast(msg, duration = 2500) {
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   clearTimeout(toastEl._timer);
   toastEl._timer = setTimeout(() => toastEl.classList.remove('show'), duration);
 }
 
-// ---- Service Worker ----
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('SW registrado'))
-      .catch(err => console.warn('SW error:', err));
+    navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW error:', err));
   });
 }

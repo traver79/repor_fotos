@@ -3,101 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Reportaje PDF" />
   <link rel="manifest" href="manifest.json" />
   <title>Reportaje PDF</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <header class="app-header">
     <div class="header-inner">
-      <span class="header-icon">📷</span>
       <h1>Reportaje PDF</h1>
     </div>
   </header>
 
   <main class="app-main">
     <form id="reportForm" novalidate>
-
-      <!-- ASUNTO -->
       <section class="form-section">
-        <label class="field-label" for="asunto">
-          <span class="label-icon">📋</span> Asunto
-        </label>
-        <textarea id="asunto" name="asunto" class="field-textarea" rows="3"
-          placeholder="Describe el asunto del reportaje..." required></textarea>
+        <label class="field-label" for="asunto">Asunto general</label>
+        <textarea id="asunto" name="asunto" class="field-textarea" rows="2" placeholder="Asunto general del reporte" required></textarea>
       </section>
 
-      <!-- FECHA -->
       <section class="form-section">
-        <label class="field-label" for="fecha">
-          <span class="label-icon">📅</span> Fecha
-        </label>
+        <label class="field-label" for="direccionCliente">Dirección del cliente</label>
+        <textarea id="direccionCliente" name="direccionCliente" class="field-textarea" rows="2" placeholder="Dirección completa"></textarea>
+      </section>
+
+      <section class="form-section">
+        <label class="field-label" for="descripcionGeneral">Descriptivo</label>
+        <textarea id="descripcionGeneral" name="descripcionGeneral" class="field-textarea" rows="3" placeholder="Descripción general"></textarea>
+      </section>
+
+      <section class="form-section">
+        <label class="field-label" for="fecha">Fecha</label>
         <input type="date" id="fecha" name="fecha" class="field-input" required />
       </section>
 
-      <!-- OBSERVACIONES -->
-      <section class="form-section">
-        <label class="field-label" for="observaciones">
-          <span class="label-icon">📝</span> Observaciones
-        </label>
-        <textarea id="observaciones" name="observaciones" class="field-textarea" rows="4"
-          placeholder="Observaciones adicionales..."></textarea>
-      </section>
-
-      <!-- FOTOS -->
       <section class="form-section fotos-section">
         <div class="fotos-header">
-          <span class="field-label"><span class="label-icon">🖼️</span> Fotos</span>
+          <span class="field-label">Fotos</span>
           <div class="foto-add-btns">
-            <button type="button" class="btn-add-foto" id="btnGaleria">
-              <span>🗂️</span> Galería
-            </button>
-            <button type="button" class="btn-add-foto" id="btnCamara">
-              <span>📸</span> Cámara
-            </button>
+            <button type="button" class="btn-add-foto" id="btnGaleria">Galería</button>
+            <button type="button" class="btn-add-foto" id="btnCamara">Cámara</button>
           </div>
         </div>
 
-        <!-- inputs ocultos -->
         <input type="file" id="inputGaleria" accept="image/*" multiple style="display:none" />
         <input type="file" id="inputCamara" accept="image/*" capture="environment" style="display:none" />
 
-        <!-- contador de fotos -->
         <div class="foto-counter" id="fotoCounter" style="display:none">
-          <span id="fotoCounterText">0 fotos añadidas</span>
-          <span class="counter-hint">El PDF mostrará 4 fotos por página (2×2)</span>
+          <span id="fotoCounterText">0 fotos</span>
+          <span class="counter-hint">El PDF usa 4 fotos por página A4.</span>
         </div>
 
-        <!-- lista de fotos -->
         <div id="fotosContainer" class="fotos-container">
           <div class="fotos-empty" id="fotosEmpty">
-            <span class="empty-icon">🏞️</span>
-            <p>Añade fotos desde la galería<br/>o con la cámara</p>
-            <p class="empty-hint">Cada foto tendrá su propio comentario.<br/>El PDF las organiza en 4 por página.</p>
+            <p>Añade fotos y escribe un comentario para cada una.</p>
           </div>
         </div>
       </section>
 
-      <!-- BOTÓN GENERAR -->
       <div class="generate-section">
-        <button type="submit" class="btn-generate" id="btnGenerar">
-          <span class="btn-icon">📄</span>
-          <span class="btn-text">GENERAR PDF</span>
-        </button>
+        <button type="submit" class="btn-generate" id="btnGenerar">Generar PDF</button>
       </div>
-
     </form>
   </main>
 
-  <!-- Toast notification -->
   <div class="toast" id="toast"></div>
 
-  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="app.js"></script>
 </body>
