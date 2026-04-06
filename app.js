@@ -144,9 +144,16 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
   const contentW = pageW - margin * 2;
   const footerY = pageH - 8;
 
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(15);
-  doc.text('Reporte fotográfico', margin, 20);
+  function drawHeader(title) {
+    doc.setFillColor(238, 238, 238);
+    doc.rect(0, 0, pageW, 20, 'F');
+    doc.setTextColor(40, 40, 40);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text(title, margin, 13);
+  }
+
+  drawHeader('Reporte fotográfico');
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
@@ -163,7 +170,6 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
   doc.text(`Fotos: ${fotosActivas.length} (${totalPagFotos} página${totalPagFotos !== 1 ? 's' : ''})`, margin, y + 2);
 
   if (fotosActivas.length > 0) {
-    const headerTop = 15;
     const headerBottom = 25;
     const footerSpace = 12;
     const colGap = 6;
@@ -182,9 +188,7 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
 
       if (pos === 0) {
         doc.addPage();
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text('Fotos', margin, headerTop + 2);
+        drawHeader('Fotos');
       }
 
       const col = pos % 2;
@@ -285,6 +289,6 @@ function showToast(msg, duration = 2500) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW error:', err));
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch((err) => console.warn('SW error:', err));
   });
 }
