@@ -1,81 +1,85 @@
-# 📷 Reportaje PDF
+# Reportaje PDF
 
-PWA (Progressive Web App) para crear reportajes fotográficos en PDF directamente desde el móvil.
+Aplicación web/PWA para generar reportes fotográficos en PDF desde móvil o escritorio, sin backend.
 
-## ✨ Características
+## Qué hace ahora
 
-- **Formulario completo**: Asunto, fecha (hoy por defecto) y observaciones
-- **Gestión de fotos**: Elige desde la galería o captura con la cámara
-- **Comentarios por foto**: Añade texto descriptivo a cada imagen
-- **Previsualización**: Ve las fotos antes de generar el PDF
-- **Generación PDF**: PDF profesional con cabecera, fotos y comentarios
-- **PWA**: Instalable en móvil, funciona offline (fotos ya cargadas)
-- **Sin servidor**: Todo funciona en el navegador, sin backend
+- Formulario simple con:
+  - Asunto general (obligatorio)
+  - Dirección del cliente
+  - Descriptivo
+  - Fecha (obligatoria, con valor por defecto hoy)
+- Carga de fotos desde galería o cámara.
+- Comentario individual por foto.
+- Salida en PDF A4:
+  - Portada con datos del reporte.
+  - Páginas de fotos en cuadrícula 2x2 (4 fotos por página).
+  - Encabezado gris claro y pie con numeración.
 
-## 🚀 Cómo usar
+## Uso rápido
 
-### Opción 1 – GitHub Pages (recomendado)
-
-1. Haz fork de este repositorio
-2. Ve a **Settings → Pages → Branch: main → / (root)**
-3. Abre la URL que te dé GitHub Pages en tu móvil
-4. Instala la app: menú del navegador → "Añadir a pantalla de inicio"
-
-### Opción 2 – Servidor local
+### Opción 1: servidor local
 
 ```bash
-# Con Python
 python3 -m http.server 8080
-
-# Con Node.js / npx
+# o
 npx serve .
 ```
 
-Abre `http://localhost:8080` en tu navegador.
+Abrir `http://localhost:8080`.
 
-### Opción 3 – Cualquier hosting estático
+### Opción 2: hosting estático
 
-Sube todos los archivos a Netlify, Vercel, Cloudflare Pages, etc.
+Publica estos archivos en GitHub Pages, Netlify, Vercel, Cloudflare Pages o similar.
 
-## 📁 Estructura
+## Estructura del proyecto
 
-```
-reportaje-pdf/
-├── index.html          # App principal
-├── style.css           # Estilos
-├── app.js              # Lógica + generación PDF
-├── sw.js               # Service Worker (offline)
-├── manifest.json       # Manifiesto PWA
-├── generate-icons.js   # Script helper para iconos
+```txt
+.
+├── index.html
+├── style.css
+├── app.js
+├── sw.js
+├── manifest.json
+├── generate-icons.js
 └── icons/
-    ├── icon-192.png    # Icono PWA
-    └── icon-512.png    # Icono PWA grande
 ```
 
-## 🔧 Dependencias externas (CDN)
+## Dependencias
 
-- **jsPDF 2.5.1** – Generación de PDF en el cliente
-- **Google Fonts** – Tipografías Syne y DM Sans
+- `jsPDF` desde CDN para generar el PDF en cliente.
+- No requiere instalación de paquetes para ejecutarse.
 
-No hay dependencias npm necesarias para ejecutar la app.
+## PWA y caché (importante)
 
-## 📄 Formato del PDF generado
+La app usa Service Worker (`sw.js`) para cachear recursos.
 
-- Cabecera con franja de color, nombre del app y fecha
-- Asunto en tamaño grande
-- Observaciones (si las hay)
-- Fotos con numeración y comentarios
-- Pie de página con numeración
-- Todo en A4 portrait
+Si ves una versión vieja (por ejemplo, estilos antiguos o cambios de PDF que no aparecen):
 
-## 🔮 Próximas mejoras
+1. Haz una recarga forzada del navegador.
+2. Cierra y vuelve a abrir la app instalada.
+3. En DevTools, limpia storage/cache del sitio.
 
-- [ ] Selector de plantillas de PDF
-- [ ] Logo personalizado en cabecera
-- [ ] Reordenar fotos con drag & drop
-- [ ] Exportar también a DOCX
-- [ ] Modo claro / oscuro
+El registro del SW está configurado para reducir problemas de caché en despliegues.
 
-## 📝 Licencia
+## Nota sobre conflictos de merge
 
-MIT – úsalo libremente.
+Si GitHub marca conflictos en `app.js`:
+
+1. Abre el archivo en la rama de trabajo.
+2. Elimina cualquier bloque con:
+   - `<<<<<<<`
+   - `=======`
+   - `>>>>>>>`
+3. Deja una única versión final válida.
+4. Ejecuta:
+
+```bash
+node --check app.js
+```
+
+5. Commit y push de la resolución.
+
+## Licencia
+
+MIT.
