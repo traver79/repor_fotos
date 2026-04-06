@@ -2,14 +2,13 @@
    Service Worker - Reportaje PDF
    ============================================ */
 
-const CACHE_NAME = 'reportaje-pdf-v2';
+const CACHE_NAME = 'reportaje-pdf-v3';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
   './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
 ];
 

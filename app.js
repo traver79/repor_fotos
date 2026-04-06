@@ -289,6 +289,6 @@ function showToast(msg, duration = 2500) {
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW error:', err));
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch((err) => console.warn('SW error:', err));
   });
 }
