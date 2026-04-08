@@ -2,7 +2,7 @@
    Service Worker - Reportaje PDF
    ============================================ */
 
-const CACHE_NAME = 'reportaje-pdf-v3';
+const CACHE_NAME = 'reportaje-pdf-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -38,17 +38,28 @@ self.addEventListener('fetch', (event) => {
   // Solo cachear GET
   if (event.request.method !== 'GET') return;
 
+  const req = event.request;
+  const url = new URL(req.url);
+  const isSameOrigin = url.origin === self.location.origin;
+
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        // Cachear respuestas válidas
+    fetch(req)
+      .then((response) => {
         if (response && response.status === 200 && response.type !== 'opaque') {
           const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
         }
         return response;
-      }).catch(() => cached);
-    })
+      })
+      .catch(async () => {
+        const cached = await caches.match(req);
+        if (cached) return cached;
+
+        if (isSameOrigin) {
+          return caches.match('./index.html');
+        }
+
+        throw new Error('Recurso no disponible sin conexión');
+      })
   );
 });
