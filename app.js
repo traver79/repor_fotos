@@ -7,6 +7,7 @@ const reportForm = document.getElementById('reportForm');
 const asuntoEl = document.getElementById('asunto');
 const direccionEl = document.getElementById('direccionCliente');
 const descripcionEl = document.getElementById('descripcionGeneral');
+const tipoReporteEl = document.getElementById('tipoReporte');
 const fechaEl = document.getElementById('fecha');
 const inputGaleria = document.getElementById('inputGaleria');
 const inputCamara = document.getElementById('inputCamara');
@@ -104,6 +105,7 @@ reportForm.addEventListener('submit', async (e) => {
   const asunto = asuntoEl.value.trim();
   const direccionCliente = direccionEl.value.trim();
   const descripcionGeneral = descripcionEl.value.trim();
+  const tipoReporte = tipoReporteEl.value.trim();
   const fecha = fechaEl.value;
 
   if (!asunto) {
@@ -124,7 +126,7 @@ reportForm.addEventListener('submit', async (e) => {
   showToast('Generando PDF...');
 
   try {
-    await generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha, fotosActivas });
+    await generarPDF({ asunto, direccionCliente, descripcionGeneral, tipoReporte, fecha, fotosActivas });
     showToast('PDF generado');
   } catch (error) {
     console.error(error);
@@ -134,7 +136,7 @@ reportForm.addEventListener('submit', async (e) => {
   }
 });
 
-async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha, fotosActivas }) {
+async function generarPDF({ asunto, direccionCliente, descripcionGeneral, tipoReporte, fecha, fotosActivas }) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
@@ -144,16 +146,25 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
   const contentW = pageW - margin * 2;
   const footerY = pageH - 8;
 
-  function drawHeader(title) {
+  function drawHeader(title, subtitle = '') {
     doc.setFillColor(238, 238, 238);
     doc.rect(0, 0, pageW, 26, 'F');
     doc.setTextColor(40, 40, 40);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(17);
     doc.text(title, margin, 17);
+
+    doc.setFontSize(12);
+    doc.text('Instaltraver s.l.', pageW - margin, 17, { align: 'right' });
+
+    if (subtitle) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(subtitle, margin, 23);
+    }
   }
 
-  drawHeader('Reporte fotográfico');
+  drawHeader('Reporte fotográfico', tipoReporte);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(13);
@@ -220,14 +231,15 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
       doc.addImage(foto.dataUrl, format, imgX, imgY, dw, dh);
 
       const comentarioY = yBase + rowH - comentarioH + 6;
-      const comentarioTexto = (foto.comentario || 'Sin comentario').trim();
-      const lineas = doc.splitTextToSize(comentarioTexto, cellW - 4).slice(0, 3);
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      lineas.forEach((linea, idx) => {
-        doc.text(linea, x + 2, comentarioY + idx * 3.2);
-      });
+      const comentarioTexto = (foto.comentario || '').trim();
+      if (comentarioTexto) {
+        const lineas = doc.splitTextToSize(comentarioTexto, cellW - 4).slice(0, 3);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        lineas.forEach((linea, idx) => {
+          doc.text(linea, x + 2, comentarioY + idx * 3.2);
+        });
+      }
     }
   }
 
