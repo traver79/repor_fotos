@@ -146,40 +146,40 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
 
   function drawHeader(title) {
     doc.setFillColor(238, 238, 238);
-    doc.rect(0, 0, pageW, 20, 'F');
+    doc.rect(0, 0, pageW, 26, 'F');
     doc.setTextColor(40, 40, 40);
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(12);
-    doc.text(title, margin, 13);
+    doc.setFontSize(17);
+    doc.text(title, margin, 17);
   }
 
   drawHeader('Reporte fotográfico');
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.text(`Fecha: ${formatearFecha(fecha)}`, margin, 28);
+  doc.setFontSize(13);
+  doc.text(`Fecha: ${formatearFecha(fecha)}`, margin, 35);
 
-  let y = 38;
+  let y = 48;
   y = drawBlock(doc, 'Asunto general', asunto, margin, y, contentW);
   y = drawBlock(doc, 'Dirección del cliente', direccionCliente || 'No indicada', margin, y, contentW);
   y = drawBlock(doc, 'Descriptivo', descripcionGeneral || 'Sin descriptivo', margin, y, contentW);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
+  doc.setFontSize(11);
   const totalPagFotos = Math.ceil((fotosActivas.length || 1) / 4);
-  doc.text(`Fotos: ${fotosActivas.length} (${totalPagFotos} página${totalPagFotos !== 1 ? 's' : ''})`, margin, y + 2);
+  doc.text(`Fotos: ${fotosActivas.length} (${totalPagFotos} página${totalPagFotos !== 1 ? 's' : ''})`, margin, y + 3);
 
   if (fotosActivas.length > 0) {
     const headerBottom = 25;
     const footerSpace = 12;
     const colGap = 6;
     const rowGap = 6;
-    const comentarioH = 13;
+    const comentarioH = 16;
 
     const usableH = pageH - headerBottom - margin - footerSpace;
     const cellW = (contentW - colGap) / 2;
     const rowH = (usableH - rowGap) / 2;
-    const imgH = rowH - comentarioH - 3;
+    const imgH = rowH - comentarioH - 6;
 
     const colX = [margin, margin + cellW + colGap];
 
@@ -219,7 +219,7 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
 
       doc.addImage(foto.dataUrl, format, imgX, imgY, dw, dh);
 
-      const comentarioY = yBase + rowH - comentarioH + 3;
+      const comentarioY = yBase + rowH - comentarioH + 6;
       const comentarioTexto = (foto.comentario || 'Sin comentario').trim();
       const lineas = doc.splitTextToSize(comentarioTexto, cellW - 4).slice(0, 3);
 
@@ -239,23 +239,40 @@ async function generarPDF({ asunto, direccionCliente, descripcionGeneral, fecha,
     doc.text(`Página ${page} de ${totalPages}`, pageW / 2, footerY, { align: 'center' });
   }
 
-  doc.save(`reporte_${fecha.replace(/-/g, '')}.pdf`);
+  const baseDireccion = sanitizeFilePart(direccionCliente || 'sin_direccion');
+  doc.save(`reporte_${baseDireccion}_${fecha.replace(/-/g, '')}.pdf`);
+}
+
+function sanitizeFilePart(value) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40) || 'sin_direccion';
 }
 
 function drawBlock(doc, title, value, x, y, width) {
+  doc.setDrawColor(220);
+  doc.setLineWidth(0.2);
+
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
+  doc.setFontSize(13);
   doc.text(title, x, y);
 
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
+  doc.setFontSize(12);
   const lines = doc.splitTextToSize(value, width);
-  let textY = y + 5;
+  let textY = y + 7;
   lines.forEach((line) => {
     doc.text(line, x, textY);
-    textY += 4.5;
+    textY += 6;
   });
-  return textY + 3;
+
+  const dividerY = textY + 2;
+  doc.line(x, dividerY, x + width, dividerY);
+  return dividerY + 7;
 }
 
 function getImgFormat(dataUrl) {

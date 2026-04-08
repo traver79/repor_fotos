@@ -141,7 +141,7 @@ h1 { font-size: 20px; }
   display: block;
 }
 
-.foto-card-body { padding: 8px; }
+.foto-card-body { padding: 12px 10px 10px; margin-top: 6px; }
 
 .foto-comentario-label {
   display: block;
